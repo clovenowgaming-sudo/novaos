@@ -23,6 +23,60 @@ _start:
     cli
     mov esp, offset stack_top
     mov edi, ebx
+    /* cek CPU 64-bit; kalau tidak ada, layar jadi MERAH (bukan reboot terus-menerus) */
+    pushfd
+    pop eax
+    mov ecx, eax
+    xor eax, 0x200000
+    push eax
+    popfd
+    pushfd
+    pop eax
+    push ecx
+    popfd
+    xor eax, ecx
+    jz .Lno64
+    mov eax, 0x80000000
+    cpuid
+    cmp eax, 0x80000001
+    jb .Lno64
+    mov eax, 0x80000001
+    cpuid
+    test edx, 0x20000000
+    jz .Lno64
+    jmp .Lhas64
+.Lno64:
+    lea esi, [edi + 8]
+.Ltag:
+    mov eax, [esi]
+    test eax, eax
+    jz .Ltext
+    cmp eax, 8
+    je .Lfb
+    mov ecx, [esi + 4]
+    add ecx, 7
+    and ecx, -8
+    add esi, ecx
+    jmp .Ltag
+.Lfb:
+    mov ebp, [esi + 8]
+    mov eax, [esi + 16]
+    imul eax, [esi + 24]
+    shr eax, 2
+    mov ecx, eax
+    mov edi, ebp
+    mov eax, 0x00FF0000
+    rep stosd
+    jmp .Lstop
+.Ltext:
+    mov edi, 0xB8000
+    mov ecx, 1000
+    mov eax, 0x4F204F20
+    rep stosd
+.Lstop:
+    hlt
+    jmp .Lstop
+.Lhas64:
     mov eax, offset pdpt
     or eax, 3
     mov DWORD PTR [pml4], eax
