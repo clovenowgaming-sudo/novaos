@@ -9,7 +9,7 @@ ESP_LBA, ESP_SECT = 2048, 16384
 NFS_LBA, NFS_SECT = 18432, 32768          # harus sama dengan kernel/store.h (IMG_SECT, 2*NFS_SLOT)
 CFG = 'set timeout=0\nset default=0\nset gfxpayload=keep\nmenuentry "Nova OS" {\n    multiboot2 (memdisk)/boot/kernel.elf\n    boot\n}\n'
 BIOS_MODS = "biosdisk part_msdos part_gpt fat memdisk tar normal configfile boot echo test multiboot2 all_video video video_fb vbe"
-EFI_MODS = "part_msdos part_gpt fat memdisk tar normal configfile boot echo test multiboot2 all_video video video_fb efi_gop efi_uga"
+EFI_MODS = "part_msdos part_gpt fat memdisk tar normal configfile boot echo test multiboot2 all_video video video_fb efi_gop "
 
 def make_tar(kernel):
     b = io.BytesIO()
